@@ -11,11 +11,59 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/checkitem")
 public class CheckItemController {
     @Reference
     private CheckItemService checkItemService;
+    //查询所有
+    @RequestMapping("/findAll")
+    public Result findAll() {
+        try {
+            List<CheckItem> itemList = checkItemService.findAll();
+
+             return new Result(true, MessageConstant.QUERY_CHECKITEM_SUCCESS, itemList);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result(false, MessageConstant.QUERY_CHECKITEM_FAIL);
+        }
+    }
+    //编辑检查项
+    @RequestMapping("/edit")
+    public Result edit(@RequestBody CheckItem checkItem){
+        try {
+             checkItemService.edit(checkItem);
+            return new Result(true, MessageConstant.EDIT_CHECKITEM_SUCCESS);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new Result(false, MessageConstant.EDIT_CHECKITEM_FAIL);
+        }
+    }
+    //回显检查项数据
+    @RequestMapping("/findById")
+    public Result findById(Integer id){
+        try {
+            CheckItem checkItem = checkItemService.findById(id);
+            return new Result(true, MessageConstant.QUERY_CHECKITEM_SUCCESS,checkItem);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new Result(false, MessageConstant.QUERY_CHECKITEM_FAIL);
+        }
+    }
+    //检查项删除
+    @RequestMapping("/delectById")
+    public Result delect(Integer id){
+        try {
+            checkItemService.delect(id);
+            return new Result(true, MessageConstant.DELETE_CHECKITEM_SUCCESS);
+        }catch (Exception e){
+            e.printStackTrace();
+            return new Result(false, MessageConstant.DELETE_CHECKITEM_FAIL);
+        }
+    }
     //分页查询
     @RequestMapping("/findpage")
     public PageResult findpage(@RequestBody QueryPageBean queryPageBean){

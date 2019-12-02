@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.czy.mapper.CheckGroupMapper">
+    <!--插入检查项数据-->
+    <insert id="add" parameterType="checkGroup">
+        <selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into t_checkgroup(code,name,sex,helpCode,remark,attention)
+                      values
+        (#{code},#{name},#{sex},#{helpCode},#{remark},#{attention})
+    </insert>
+    <!--设置检查组和检查项多对多关系-->
+    <insert id="setCheckItemAndCheckGroup" parameterType="map">
+        insert into t_checkgroup_checkitem(checkgroup_id,checkitem_id)
+        values
+        (#{checkgroupId},#{checkitemId})
+    </insert>
+    <select id="selectByCondition" parameterType="String" resultType="checkGroup">
+        select * from t_checkgroup
+        <if test="value != null and value != '' and value.length > 0">
+            where code = #{value} or name = #{value} or helpCode = #{value}
+        </if>
+    </select>
+
+</mapper>
