@@ -288,6 +288,17 @@
                 },
                 //编辑
                 handleEdit() {
+                    axios.post("/checkgroup/edit?checkitemIds="+this.checkitemIds,this.formData).then((res)=>{
+                        this.dialogFormVisible4Edit=false;
+                        if(res.data.flag){
+
+                            this.$message.success(res.data.message)
+                        }else{
+                            res.$message.error(res.data.message)
+                        }
+                    }).finally(()=>{
+                        this.findPage();
+                    });
                 },
                 //添加
                 handleAdd () {
@@ -331,12 +342,38 @@
                         if(res.data.flag){
                             this.tableData=res.data.data;
                         }else{
-                            res.$message.error(res.data.message)
+                            this.$message.error(res.data.message)
                         }
                     });
                 },
                 // 弹出编辑窗口
                 handleUpdate(row) {
+                    this.dialogFormVisible4Edit=true;
+                    //默认切换到第一个标签页（基本信息）
+                    this.activeName='first';
+                    axios.get("/checkgroup/findById?id="+row.id).then((res)=>{
+                        if (res.data.flag){
+                            this.formData=res.data.data;
+                        }else{
+                            this.$message.error(res.data.message)
+                        }
+                    });
+                    axios.get("/checkitem/findAll").then((res)=>{
+                        if (res.data.flag){
+                            this.tableData=res.data.data;
+                            //发送ajax请求，根据检查组ID查询当前检查组包含的检查项ID，用于页面复选框回显
+                            axios.get("/checkgroup/findCheckItemIdsByCheckGroupId?id="+row.id).then((res)=>{
+                                if(res.data.flag){
+                                    this.checkitemIds = res.data.data;
+                                }else{
+                                    this.$message.error(res.data.message);
+                                }
+                            });
+                        }else{
+                            res.$message.error(res.data.message)
+                        }
+                    })
+
                 },
                 //切换页码
                 handleCurrentChange(currentPage) {
@@ -345,6 +382,22 @@
                 },
                 // 删除
                 handleDelete(row) {
+                    this.$confirm('确认删除该文件吗?', '提示', {type: 'warning'}).then(() => {
+                       axios.get("/checkgroup/deleteById?id="+row.id).then((res)=>{
+                           if(res.data.flag){
+
+                               this.$message.success(res.data.message)
+                               this.findPage();
+                           }else{
+                               res.$message.error(res.data.message)
+                           }
+                       })
+                    }).catch(() => {
+                        this.$message({
+                            type: 'info',
+                            message: '已取消删除'
+                        });
+                    });
                 }
             }
         })
